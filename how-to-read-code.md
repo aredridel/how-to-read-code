@@ -295,3 +295,20 @@ Configuration
 A `kraken` config file.
 
 ^ Kraken took a 'low power language' approach to configuration and chose json. 
+
+----
+
+Unfinished:
+
+Here's a trick for reading what the author is letting through:
+
+Ask what a filter doesn't pass.
+
+if (foo === null) {
+}
+
+"null is special, everything else is treated differently."
+
+"even undefined. And false."
+
+Maybe the author meant "== null"
