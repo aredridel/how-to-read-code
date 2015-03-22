@@ -18,12 +18,15 @@ I almost didn't give this talk.
 ---
 
 What do we mean when we say "reading source code"?
+--------------------------------------------------
 
 Reading for comprehension
 
 Reading to find bugs
 
-Reading for interactions
+Reading to find interactions
+
+Reading to review
 
 ---
 
@@ -49,7 +52,7 @@ Another way to think of kinds of source code
 
 ^ There's a lot of study of algorithmic source code out there because that's what academia produces: algorithms, the little, often mathematical ways of doing things. All the others are a lot more nebulous but I think a lot more interesting. They're certainly the bulk of what most people write when they're programming computers.
 
-^ Of course, sometimes, a bit of code does more than one of these things.
+^ Of course, sometimes, something does more than one of these things. Many times, in fact. Figuring out what it's trying to be can be one of the first tasks.
 
 ---
 
