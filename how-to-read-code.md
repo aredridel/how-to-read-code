@@ -1,6 +1,20 @@
 How To Read Source Code
 =======================
 
+Aria Stewart
+
+@aredridel
+
+---
+
+I almost didn't give this talk.
+
+^ Like there's any programmers out there who don't read source code.
+
+^ Then I met a bunch of programmers who don't read source code. And I talked to some more who wouldn't read anything but the examples.
+
+^ When they were maintaining software, they'd do almost anything to avoid reading the source code.
+
 ---
 
 What do we mean when we say "reading source code"?
