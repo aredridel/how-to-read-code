@@ -280,6 +280,22 @@ Configuration
 
 ^ The line between source code and configuration file is super thin. There's a constant tension between having a configuration be expressive and readable and direct.
 
+----
+
+```javascript
+app.configure('production', 'staging', function() {
+  app.enable('emails');
+});
+
+app.configure('test', function() {
+  app.disable('emails');
+});
+```
+
+An example using Javascript for configuration.
+
+^ What we can run into here is combinatorial explosion of options. How many environments do we configure? Then, how many things do we configure for a specific instance of that environment. It's really easy to go overboard and end up with all the possible permutations, and to have bugs that only show up in one of them. Keeping an eye out for how many degrees of freedom the configuration allows is super useful.
+
 ---
 
 ```javascript
@@ -309,23 +325,224 @@ Configuration
 
 ```
 
-A `kraken` config file.
+A bit of `kraken` config file.
 
-^ Kraken took a 'low power language' approach to configuration and chose json. 
+^ Kraken took a 'low power language' approach to configuration and chose JSON. A little more "configuration" and a little less "source code". One of the goals was keeping that combinatorial explosion under control. There's a reason a lot of tools use simple key-value pairs or ini-style files for configuration.
+
+---
+
+Configuration source code has some interesting and unique constraints that are worth looking for.
+
+* Lifetime
+* Machine writability
+* Responsible people vary a lot more
+* Have to fit in weird places like environment variables
+* Often store security-sensitive information
+
+---
+
+Tasking
+-------
+
+---
+
+What do charging 50 credit cards, building a complex piece of software with a compiler and build tools, and sending 100 emails have in common?
+
+^ Transactionality. Often, some piece of the system needs to happen exactly once, and not at all if there's an error. A compiler that leaves bad build products around is a great source of bugs. Double charging customers is bad. Flooding someone's inbox because of a retry cycle is terrible.
+
+^ Resumabilty. A need to continue where they left off given the state of the system.
+
+^ Sequentiality. If they're not strictly linear processes, there's usually a very directed flow through the code. Loops tend to be big ones, around the whole shebang.
+
+---
+
+Reading Messy Code
+------------------
+
+---
+
+So how do you deal with this?
+
+```javascript
+      DuplexCombination.prototype.on = function(ev, fn) {
+    switch (ev) {
+  case 'data':
+  case 'end':
+  case 'readable':
+this.reader.on(ev, fn);
+return this
+  case 'drain':
+  case 'finish':
+this.writer.on(ev, fn);
+return this
+  default:
+return Duplex.prototype.on.call(this, ev, fn);
+    }
+      };
+```
+
+You are seeing that right. That's reverse indendation. Blame Isaac.
+
+---
+
+Rose tinted glasses!
+--------------------
+
+`jsfmt < dc.js > readable-dc.js` 
+
+
+```javascript
+DuplexCombination.prototype.on = function(ev, fn) {
+  switch (ev) {
+    case 'data':
+    case 'end':
+    case 'readable':
+      this.reader.on(ev, fn);
+      return this
+    case 'drain':
+    case 'finish':
+      this.writer.on(ev, fn);
+      return this
+    default:
+      return Duplex.prototype.on.call(this, ev, fn);
+  }
+};
+```
+
+It's okay to use tools while reading! 
+
+---
+
+How do you read this?
+
+```
+(function(t,e){if(typeof define==="function"&&define.amd){define(["underscore","
+jquery","exports"],function(i,r,s){t.Backbone=e(t,s,i,r)})}else if(typeof export
+s!=="undefined"){var i=require("underscore");e(t,exports,i)}else{t.Backbone=e(t,
+{},t._,t.jQuery||t.Zepto||t.ender||t.$)}})(this,function(t,e,i,r){var s=t.Backbo
+ne;var n=[];var a=n.push;var o=n.slice;var h=n.splice;e.VERSION="1.1.2";e.$=r;e.
+noConflict=function(){t.Backbone=s;return this};e.emulateHTTP=false;e.emulateJSO
+N=false;var u=e.Events={on:function(t,e,i){if(!c(this,"on",t,[e,i])||!e)return t
+his;this._events||(this._events={});var r=this._events[t]||(this._events[t]=[]);
+r.push({callback:e,context:i,ctx:i||this});return this},once:function(t,e,r){if(
+!c(this,"once",t,[e,r])||!e)return this;var s=this;var n=i.once(function(){s.off
+(t,n);e.apply(this,arguments)});n._callback=e;return this.on(t,n,r)},off:functio
+n(t,e,r){var s,n,a,o,h,u,l,f;if(!this._events||!c(this,"off",t,[e,r]))return thi
+s;if(!t&&!e&&!r){this._events=void 0;return this}o=t?[t]:i.keys(this._events);fo
+r(h=0,u=o.length;h<u;h++){t=o[h];if(a=this._events[t]){this._events[t]=s=[];if(e
+||r){for(l=0,f=a.length;l<f;l++){n=a[l];if(e&&e!==n.callback&&e!==n.callback._ca
+llback||r&&r!==n.context){s.push(n)}}}if(!s.length)delete this._events[t]}}retur
+n this},trigger:function(t){if(!this._events)return this;var e=o.call(arguments,
+1);if(!c(this,"trigger",t,e))return this;var i=this._events[t];var r=this._event
+s.all;if(i)f(i,e);if(r)f(r,arguments);return this},stopListening:function(t,e,r)
+{var s=this._listeningTo;if(!s)return this;var n=!e&&!r;if(!r&&typeof e==="objec
+```
+
+---
+
+`uglifyjs -b < backbone-min.js`
+
+```javascript
+(function(t, e) {
+    if (typeof define === "function" && define.amd) {
+        define([ "underscore", "jquery", "exports" ], function(i, r, s) {
+            t.Backbone = e(t, s, i, r);
+        });
+    } else if (typeof exports !== "undefined") {
+        var i = require("underscore");
+        e(t, exports, i);
+    } else {
+        t.Backbone = e(t, {}, t._, t.jQuery || t.Zepto || t.ender || t.$);
+    }
+})(this, function(t, e, i, r) {
+    var s = t.Backbone;
+    var n = [];
+    var a = n.push;
+    var o = n.slice;
+    var h = n.splice;
+    e.VERSION = "1.1.2";
+    e.$ = r;
+    e.noConflict = function() {
+```
+
+---
+
+Human Parts
+-----------
+
+Or: _guessing intent is dangerous but you learn so much_
 
 ----
 
-Unfinished:
+There's a lot of tricks for figuring out what the author of something meant.
 
-Here's a trick for reading what the author is letting through:
+----
 
-Ask what a filter doesn't pass.
+Look at the cases of what's excluded from a condition
 
-if (foo === null) {
-}
+```javascript
+if (foo === null)
+```
 
-"null is special, everything else is treated differently."
+Did the author intend to treat `undefined` differently from `null`?
 
-"even undefined. And false."
+```javascript
+if (foo)
+```
+Is this checking for the presence of a value, or is it a true/false switch?
 
-Maybe the author meant "== null"
+^ That first one might be a case of the cult of triple equals.
+
+---
+
+Look for guards and coercions, and defaults
+
+```javascript
+if (typeof arg != 'number') throw new TypeError("arg must be a number");
+```
+
+Looks like the domain of whatever function we're in is 'numbers'.
+
+```javascript
+arg = Number(arg)
+```
+
+Coerce things to numeric. Same domain as above, but doesn't reject errors via exceptions. There might be `NaN`s though. Probably smart to read and check if there's comparisons that will be false against those.
+
+```javascript
+arg = arg || {}
+```
+
+Default to an empty object.
+
+```javascript
+arg = arg == null ? true : arg
+```
+
+Default to true only if a value wasn't explicitly passed.
+
+---
+
+Look for layers
+
+`req` and `res` from Express are tied to the web; how deep do they go?
+
+Is there an interface boundary you can find?
+
+---
+
+Look for tracing
+
+Are there inspection points?
+
+Debug logs?
+
+Do those form a complete narrative? Or are they ad-hoc leftovers from the last few bugs?
+
+---
+
+Look for reflexivity
+
+Are identifiers being dynamically generated?
+
+Is there `eval`? Metaprogramming? New function creation?
