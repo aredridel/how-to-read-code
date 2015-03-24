@@ -7,6 +7,23 @@ Look at lifetimes
 * Is this information somewhere else in the mean time?
 * Is it ever inconsistent?
 
+----
+
+Somewhere, someone typed the value you see into a keyboard, generated it from a random number generator, or computed it and saved it.
+
+Somewhere else, some time else, that value will affect some human or humans. Who are these people?
+
+What or who chooses who they are?
+
+Is that value ever going to change?
+
+Who changes it?
+
+Now look at your code, and back to me, now back to your code, now back at me. Your code itself has turned into values, typed into a keyboard, by a human, for a human.
+
+----
+
+
 Look for hidden state machines
 ------------------------------
 
