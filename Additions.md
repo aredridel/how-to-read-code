@@ -63,3 +63,16 @@ Mixins? Merged values or unions of some sort?
 
 What sort of types can you spot?
 Strings? Numbers? Arrays? Dictionaries?
+
+-----
+
+Reading Order
+-------------
+
+Do start at the entry point of a package? 
+
+how about in a browser?
+
+Try setting a breakpoint early and tracing down through functions in a debugger.
+
+Try setting a breakpoint deep in the code, and following the path back up.
