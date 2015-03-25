@@ -27,18 +27,25 @@ Now look at your code, and back to me, now back to your code, now back at me. Yo
 Look for hidden state machines
 ------------------------------
 
-Sometimes boolean variables get used together as a decomposed state machine
+^ Sometimes boolean variables get used together as a decomposed state machine
 
-For example, the variables `isReadied` and `isFinished` might show a state machine like so:
+^ For example, the variables `isReadied` and `isFinished` might show a state machine like so:
 
 `START -> READY -> FINISHED`
 
+----
+
+Look for hidden state machines
+------------------------------
+
+```
 isReadied | isFinished | state
 ----------|------------|------------
-`false`   | `false`    | START
-`false`   | `true`     | _invalid_ 
-`true`    | `false`    | READY
-`true`    | `true`     | FINISHED
+false     | false      | START
+false     | true       | invalid
+true      | false      | READY
+true      | true       | FINISHED
+```
 
 ^ Note that they can also express the state `!isReadied && isFinished` -- which might be an interesting source of bugs, if something can end up at the finished state without first being ready.
 
