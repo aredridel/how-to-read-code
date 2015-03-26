@@ -665,3 +665,4 @@ Examine a callback by logging `callback.toString()`. Search for where that's def
 
 -----
 
+Look for common operations: `map`. `reduce`. `cross-join`.
