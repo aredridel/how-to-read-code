@@ -11,9 +11,7 @@ Aria Stewart
 
 ^ So why do we concatenate strings in complicated ways instead of simple ones?
 
-^ Maintenance.
-
-^ Different responsibilities.
+^ Different responsibilities. I'll come back to this later.
 
 ---
 
@@ -21,7 +19,7 @@ I almost didn't give this talk.
 
 ^ Like there's any programmers out there who don't read source code.
 
-^ Then I met a bunch of programmers who don't read source code. And I talked to some more who wouldn't read anything but the examples.
+^ Then I met a bunch of programmers who don't read source code. And I talked to some more who wouldn't read anything but the examples. And I met a _lot_ of beginning programmers who have a hard time figuring out where to start.
 
 ^ When they were maintaining software, they'd do almost anything to avoid reading the source code.
 
@@ -38,16 +36,32 @@ Reading to find interactions
 
 Reading to review
 
+Reading to see the interface
+
+Reading to learn!
+
 ---
 
 Kinds of source code
 
-* C++
 * Javascript
+* C++
 * ES6
 * Coffee Script
 * Shell Script
+
+^ Who reads any of these kinds of source code?
+
+---
+
 * SNOBOL
+* APL
+* Befunge
+* Forth
+* Perl
+* Other people's javascript
+
+^ How about these?
 
 ---
 
@@ -74,6 +88,7 @@ What's 'Glue'?
 ---
 
 How do you read glue?
+---------------------
 
 ^ We're looking for how two interfaces are shaped differently, and what's common between them.
 
@@ -119,7 +134,7 @@ What's interface-defining code?
 
 ^ You know how you have some modules that are really only used one or two places, they're kinda internal, and you hope nobody looks at them too hard?
 
-^ Interface-defining is the opposite of that.
+^ Interface-defining is the opposite of that. It's the hard boundaries of your module.
 
 ---
 
@@ -148,7 +163,7 @@ EventEmitter.listenerCount = function(emitter, type) { };
 
 ^ If you have strong interface contracts, this is where you should expect to find them.
 
-^ Like glue code, look for how errors are handled and exposed. Is that consistent?
+^ Like glue code, look for how errors are handled and exposed. Is that consistent? Does it distinguish errors due to internal inconsistency from errors because the user of the interface didn't understand it?
 
 ---
 
@@ -279,7 +294,7 @@ Or, looking forward: _How much is required to use this thing correctly?_
 
 and backward: _If we're here, what got us to this point?_
 
-^ It's pretty easy to see what functions call what other functions. However, the reverse is more interesting! So one of the things you can look for when reading source code, and in particular the implementation bits is look at what things have to happen or be called to set up the state the process needs to be in to start.
+^ It's pretty easy to see what functions call what other functions. However, the reverse is more interesting! So one of the things you can look for when reading source code, and in particular the implementation bits is look at what things have to happen to set up the state the process needs to be in to begin.
 
 ^ Is that state explicit, passed in via parameters? Is it assumed to be there, as an instance variable or property? Is there a single path to get there, with an obvious place that state is set up? Or is it diffuse?
 
@@ -337,7 +352,7 @@ An example using Javascript for configuration.
 
 A bit of `kraken` config file.
 
-^ Kraken took a 'low power language' approach to configuration and chose JSON. A little more "configuration" and a little less "source code". One of the goals was keeping that combinatorial explosion under control. There's a reason a lot of tools use simple key-value pairs or ini-style files for configuration.
+^ Kraken took a 'low power language' approach to configuration and chose JSON. A little more "configuration" and a little less "source code". One of the goals was keeping that combinatorial explosion under control. There's a reason a lot of tools use simple key-value pairs or ini-style files for configuration, even though they're not terribly expressive.
 
 ---
 
@@ -398,25 +413,24 @@ You are seeing that right. That's reverse indendation. Blame Isaac.
 Rose tinted glasses!
 --------------------
 
-`jsfmt < dc.js > readable-dc.js` 
-
+`standard -F dc.js`
 
 ```javascript
-DuplexCombination.prototype.on = function(ev, fn) {
+DuplexCombination.prototype.on = function (ev, fn) {
   switch (ev) {
     case 'data':
     case 'end':
     case 'readable':
-      this.reader.on(ev, fn);
+      this.reader.on(ev, fn)
       return this
     case 'drain':
     case 'finish':
-      this.writer.on(ev, fn);
+      this.writer.on(ev, fn)
       return this
     default:
-      return Duplex.prototype.on.call(this, ev, fn);
+      return Duplex.prototype.on.call(this, ev, fn)
   }
-};
+}
 ```
 
 It's okay to use tools while reading! 
@@ -488,24 +502,8 @@ There's a lot of tricks for figuring out what the author of something meant.
 
 ----
 
-Look at the cases of what's excluded from a condition
-
-```javascript
-if (foo === null)
-```
-
-Did the author intend to treat `undefined` differently from `null`?
-
-```javascript
-if (foo)
-```
-Is this checking for the presence of a value, or is it a true/false switch?
-
-^ That first one might be a case of the cult of triple equals.
-
----
-
-Look for guards and coercions, and defaults
+Look for guards and coercions
+-------------------------------------------
 
 ```javascript
 if (typeof arg != 'number') throw new TypeError("arg must be a number");
@@ -519,6 +517,11 @@ arg = Number(arg)
 
 Coerce things to numeric. Same domain as above, but doesn't reject errors via exceptions. There might be `NaN`s though. Probably smart to read and check if there's comparisons that will be false against those.
 
+----
+
+Look for defaults
+-----------------
+
 ```javascript
 arg = arg || {}
 ```
@@ -526,7 +529,7 @@ arg = arg || {}
 Default to an empty object.
 
 ```javascript
-arg = arg == null ? true : arg
+arg = (arg == null ? true : arg)
 ```
 
 Default to true only if a value wasn't explicitly passed.
@@ -534,6 +537,7 @@ Default to true only if a value wasn't explicitly passed.
 ---
 
 Look for layers
+---------------
 
 `req` and `res` from Express are tied to the web; how deep do they go?
 
@@ -542,6 +546,7 @@ Is there an interface boundary you can find?
 ---
 
 Look for tracing
+----------------
 
 Are there inspection points?
 
@@ -552,10 +557,13 @@ Do those form a complete narrative? Or are they ad-hoc leftovers from the last f
 ---
 
 Look for reflexivity
+--------------------
 
 Are identifiers being dynamically generated?
 
 Is there `eval`? Metaprogramming? New function creation?
+
+`func.toString()` is your friend!
 
 ----
 
@@ -578,8 +586,6 @@ Look at lifetimes
 
 ^ Who changes it?
 
-^ Now look at your code, and back to me, now back to your code, now back at me. Your code itself has turned into values, typed into a keyboard, by a human, for a human.
-
 ----
 
 
@@ -589,6 +595,13 @@ Look for hidden state machines
 ^ Sometimes boolean variables get used together as a decomposed state machine
 
 ^ For example, the variables `isReadied` and `isFinished` might show a state machine like so:
+
+```
+var isReadied = false;
+var isFinished = false;
+```
+
+Or
 
 `START -> READY -> FINISHED`
 
@@ -610,30 +623,21 @@ true      | true       | FINISHED
 
 ------
 
+Look for composition and inheritance
+------------------------------------
 
-Say something about classes
+Is this made of parts I can recognize? Do those parts have names?
 
-Say something about access control
+------
 
------
+Look for common operations
+--------------------------
 
-Language power
---------------
+`map`.
 
-Pretend you don't know what language you're reading at all. Your job is to figure out what features the language written has.
+`reduce`.
 
-Does it have variables? Can they be reassigned?
-Mutable values?
-Does it have functions?
-Is there some sort of inheritance going on?
-Mixins? Merged values or unions of some sort?
-
-What sort of types can you spot?
-Strings? Numbers? Arrays? Dictionaries?
-
-How many named things are there?
-
-Humans can't really track more relationships than about Dunbar's number. That's about 150 or so, with a lot of give or take.
+cross-join.
 
 -----
 
@@ -646,8 +650,7 @@ Reading isn't linear.
 
 ^ We skip back and forth from chapter to chapter, module to module. We can read the module straight through but we won't have the definitions of things from other modules. We can read in execution order, but we won't know where we're going more than one call site down.
 
-^ Even parsers reading the source code don't work quite linearly. Either they're LL parsers, and they chug along, roughly aware of what they're expecting to be able to find at any given point, but at they don't really know if the details further on will make sense with the whole until the end, or they're LR parsers, and they see all the details, but don't really know what the parts make until the end, when they finish collapsing everything they've read into a tree and can make it into actual structure.
-
+-----
 
 Reading Order
 -------------
@@ -660,9 +663,8 @@ Try setting a breakpoint early and tracing down through functions in a debugger.
 
 Try setting a breakpoint deep in the code, and reading each function in the call stack.
 
-Examine a callback by logging `callback.toString()`. Search for where that's defined.
-
-
 -----
 
-Look for common operations: `map`. `reduce`. `cross-join`.
+Maybe it's time to go read some source code.
+
+Enjoy!
