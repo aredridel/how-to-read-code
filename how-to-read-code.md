@@ -30,15 +30,15 @@ What do we mean when we say "reading source code"?
 
 Reading for comprehension
 
-Reading to find bugs
+... to find bugs
 
-Reading to find interactions
+... to find interactions
 
-Reading to review
+... to review
 
-Reading to see the interface
+... to see the interface
 
-Reading to learn!
+... to learn!
 
 ---
 
