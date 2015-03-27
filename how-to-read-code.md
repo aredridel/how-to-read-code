@@ -663,9 +663,6 @@ cross-join.
 
 -----
 
-
------
-
-Maybe it's time to go read some source code.
+It's time to go read some source code.
 
 Enjoy!
