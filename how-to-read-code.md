@@ -42,6 +42,32 @@ Reading to learn!
 
 ---
 
+Reading isn't linear
+--------------------
+
+^ We think we can read source code like a book. Crack the introduction or README, then read through from chapter one to chapter two, on toward the conclusion.
+
+^ It's not like that. We can't even prove that a great many programs have conclusions.
+
+^ We skip back and forth from chapter to chapter, module to module. We can read the module straight through but we won't have the definitions of things from other modules. We can read in execution order, but we won't know where we're going more than one call site down.
+
+-----
+
+Reading Order
+-------------
+
+Do you start at the entry point of a package?
+
+How about in a browser?
+
+Maybe find the biggest source code file and read that first.
+
+Try setting a breakpoint early and tracing down through functions in a debugger.
+
+Try setting a breakpoint deep in the code, and reading each function in the call stack.
+
+----
+
 Kinds of source code
 
 * Javascript
@@ -67,10 +93,10 @@ Kinds of source code
 
 Another way to think of kinds of source code
 
-* Algorithmic
+* Glue
 * Interface-defining
 * Implementation
-* Glue
+* Algorithmic
 * Configuring
 * Tasking
 
@@ -167,75 +193,8 @@ EventEmitter.listenerCount = function(emitter, type) { };
 
 ---
 
-Have you ever looked at deeply algorithmic code?
-
-```javascript
-function Grammar(rules) {
-  // Processing The Grammar
-  // ======================
-  //
-  // Here we begin defining a grammar given the raw rules, terminal
-  // symbols, and symbolic references to rules
-  //
-  // The input is a list of rules.
-  //
-  // Add the accept rule
-  // -------------------
-  //
-  // The input grammar is amended with a final rule, the 'accept' rule,
-  // which if it spans the parse chart, means the entire grammar was
-  // accepted. This is needed in the case of a nulling start symbol.
-  rules.push(Rule('_accept', [Ref('start')]));
-  rules.acceptRule = rules.length - 1;
-```
-
-This bit is from a parser engine I've been working on called `lotsawa`. More on the next slide.
-
-^ It's been said a lot that good comments say why something is done or done that way, rather than what it's doing. Algorithms usually need more explanation of what's going on since if they were trivial, they'd probably be built into our standard library. Quite often to get good performance out of something, the exactly what-and-how matters a lot.
-
-^ This is the stuff that those of you with CS degrees get to drool over (or maybe have traumatic memories of).
-
----
-
-```javascript
-  // Build a list of all the symbols used in the grammar so they can be numbered instead of referred to
-  // by name, and therefore their presence can be represented by a single bit in a set.
-  function censusSymbols() {
-    var out = [];
-    rules.forEach(function(r) {
-      if (!~out.indexOf(r.name)) out.push(r.name);
-
-      r.symbols.forEach(function(s, i) {
-        var symNo = out.indexOf(s.name);
-        if (!~out.indexOf(s.name)) {
-          symNo = out.length;
-          out.push(s.name);
-        }
-
-        r.symbols[i] = symNo;
-      });
-
-      r.sym = out.indexOf(r.name);
-    });
-
-    return out;
-  }
-
-  rules.symbols = censusSymbols();
-
-```
-
-Reads like a math paper, doesn't it?
-
-^ One of the things that you usually need to see in algorithmic code is the actual data structures. This one is building a list of symbols and making sure there's no duplicates.
-
-^ Look also for hints as to the running time of the algorithm. You can see in this part, I've got two loops. In Big-O notation, that's O(n * m), then you can see that there's an `indexOf` inside that. That's another loop in Javascript, so that actually adds another factor to the running time. (twice -- looks like I could make this more optimal by re-using one of the values here) Good thing this isn't the main part of the algorithm!
-
----
-
-What part's the implementation then?
-
-^ So algorithmic code is a kind of special case of implementation code. It's not so exposed to the outside world, it's the meat of a program. Quite often it's business logic or the core processes of the software.
+Implementation
+--------------
 
 ---
 
@@ -299,6 +258,69 @@ and backward: _If we're here, what got us to this point?_
 ^ Is that state explicit, passed in via parameters? Is it assumed to be there, as an instance variable or property? Is there a single path to get there, with an obvious place that state is set up? Or is it diffuse?
 
 ---
+
+Algorithms
+-----------
+
+^ So algorithmic code is a kind of special case of implementation code. It's not so exposed to the outside world, it's the meat of a program. Quite often it's business logic or the core processes of the software.
+
+```javascript
+function Grammar(rules) {
+  // Processing The Grammar
+  //
+  // Here we begin defining a grammar given the raw rules, terminal
+  // symbols, and symbolic references to rules
+  //
+  // The input is a list of rules.
+  //
+  // The input grammar is amended with a final rule, the 'accept' rule,
+  // which if it spans the parse chart, means the entire grammar was
+  // accepted. This is needed in the case of a nulling start symbol.
+  rules.push(Rule('_accept', [Ref('start')]));
+  rules.acceptRule = rules.length - 1;
+```
+
+This bit is from a parser engine I've been working on called `lotsawa`. More on the next slide.
+
+^ It's been said a lot that good comments say why something is done or done that way, rather than what it's doing. Algorithms usually need more explanation of what's going on since if they were trivial, they'd probably be built into our standard library. Quite often to get good performance out of something, the exactly what-and-how matters a lot.
+
+^ This is the stuff that those of you with CS degrees get to drool over (or maybe have traumatic memories of).
+
+---
+
+```javascript
+  // Build a list of all the symbols used in the grammar so they can be numbered instead of referred to
+  // by name, and therefore their presence can be represented by a single bit in a set.
+  function censusSymbols() {
+    var out = [];
+    rules.forEach(function(r) {
+      if (!~out.indexOf(r.name)) out.push(r.name);
+
+      r.symbols.forEach(function(s, i) {
+        var symNo = out.indexOf(s.name);
+        if (!~out.indexOf(s.name)) {
+          symNo = out.length;
+          out.push(s.name);
+        }
+
+        r.symbols[i] = symNo;
+      });
+
+      r.sym = out.indexOf(r.name);
+    });
+
+    return out;
+  }
+
+  rules.symbols = censusSymbols();
+
+```
+
+Reads like a math paper, doesn't it?
+
+^ One of the things that you usually need to see in algorithmic code is the actual data structures. This one is building a list of symbols and making sure there's no duplicates.
+
+^ Look also for hints as to the running time of the algorithm. You can see in this part, I've got two loops. In Big-O notation, that's O(n * m), then you can see that there's an `indexOf` inside that. That's another loop in Javascript, so that actually adds another factor to the running time. (twice -- looks like I could make this more optimal by re-using one of the values here) Good thing this isn't the main part of the algorithm!
 
 Configuration
 -------------
@@ -641,27 +663,6 @@ cross-join.
 
 -----
 
-Reading isn't linear.
----------------------
-
-^ We think we can read source code like a book. Crack the introduction or README, then read through from chapter one to chapter two, on toward the conclusion.
-
-^ It's not like that. We can't even prove that a great many programs have conclusions.
-
-^ We skip back and forth from chapter to chapter, module to module. We can read the module straight through but we won't have the definitions of things from other modules. We can read in execution order, but we won't know where we're going more than one call site down.
-
------
-
-Reading Order
--------------
-
-Do start at the entry point of a package? 
-
-how about in a browser?
-
-Try setting a breakpoint early and tracing down through functions in a debugger.
-
-Try setting a breakpoint deep in the code, and reading each function in the call stack.
 
 -----
 
