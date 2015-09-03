@@ -47,7 +47,7 @@ Reading isn't linear
 
 ^ We think we can read source code like a book. Crack the introduction or README, then read through from chapter one to chapter two, on toward the conclusion.
 
-^ It's not like that. We can't even prove that a great many programs have conclusions.
+^ It's not like that. For a great many programs, we can't even prove that they end.
 
 ^ We skip back and forth from chapter to chapter, module to module. We can read the module straight through but we won't have the definitions of things from other modules. We can read in execution order, but we won't know where we're going more than one call site down.
 
