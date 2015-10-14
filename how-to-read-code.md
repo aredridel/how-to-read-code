@@ -461,7 +461,7 @@ It's okay to use tools while reading!
 
 How do you read this?
 
-```
+```javascript
 (function(t,e){if(typeof define==="function"&&define.amd){define(["underscore","
 jquery","exports"],function(i,r,s){t.Backbone=e(t,s,i,r)})}else if(typeof export
 s!=="undefined"){var i=require("underscore");e(t,exports,i)}else{t.Backbone=e(t,
@@ -618,7 +618,7 @@ Look for hidden state machines
 
 ^ For example, the variables `isReadied` and `isFinished` might show a state machine like so:
 
-```
+```javascript
 var isReadied = false;
 var isFinished = false;
 ```
