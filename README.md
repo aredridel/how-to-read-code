@@ -7,3 +7,5 @@ A PDF of the slides [can be found as a GitHub release download](https://github.c
 This is now written out as a [blog post](http://aredridel.dinhe.net/2015/03/29/how-to-read-source-code/), too.
 
 There is a [Chinese translation](https://github.com/freedombird9/how-to-read-source-code).
+
+This work is under the [Creative Commons CC0-1.0 license](http://creativecommons.org/publicdomain/zero/1.0/)
