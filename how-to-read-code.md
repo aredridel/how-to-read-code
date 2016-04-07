@@ -264,6 +264,8 @@ Algorithms
 
 ^ So algorithmic code is a kind of special case of implementation code. It's not so exposed to the outside world, it's the meat of a program. Quite often it's business logic or the core processes of the software.
 
+----
+
 ```javascript
 function Grammar(rules) {
   // Processing The Grammar
@@ -321,6 +323,8 @@ Reads like a math paper, doesn't it?
 ^ One of the things that you usually need to see in algorithmic code is the actual data structures. This one is building a list of symbols and making sure there's no duplicates.
 
 ^ Look also for hints as to the running time of the algorithm. You can see in this part, I've got two loops. In Big-O notation, that's O(n * m), then you can see that there's an `indexOf` inside that. That's another loop in Javascript, so that actually adds another factor to the running time. (twice -- looks like I could make this more optimal by re-using one of the values here) Good thing this isn't the main part of the algorithm!
+
+----
 
 Configuration
 -------------
@@ -532,6 +536,8 @@ if (typeof arg != 'number') throw new TypeError("arg must be a number");
 ```
 
 Looks like the domain of whatever function we're in is 'numbers'.
+
+----
 
 ```javascript
 arg = Number(arg)
